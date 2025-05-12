@@ -459,9 +459,9 @@
                 ctx.beginPath();
                 ctx.arc(equilibriumX, particleY, particleRadius, 0, 2 * Math.PI);
                 // Example: If you wanted to highlight a transverse particle too
-                // ctx.fillStyle = (index === highlightedParticleIndex && currentWaveType === 'transverse') ? 
-                //                 getComputedStyle(document.documentElement).getPropertyValue('--highlight-particle-color').trim() :
-                //                 getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+                ctx.fillStyle = (index === highlightedParticleIndex && currentWaveType === 'transverse') ? 
+                                getComputedStyle(document.documentElement).getPropertyValue('--highlight-particle-color').trim() :
+                                getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
                 ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
                 ctx.fill();
             });
