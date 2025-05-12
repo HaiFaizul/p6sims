@@ -5,24 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Wave Simulation - Hai</title>
     <style>
-        /* --- Root variables and basic styles unchanged --- */
-        :root {
-            --primary-color: #3498db;  /* Blue */
-            --secondary-color: #2ecc71; /* Green */
-            --accent-color: #e74c3c;   /* Red */
-            --text-color: #333;
-            --light-text-color: #555;
-            --bg-color: #f4f7f6;
-            --container-bg: #ffffff;
-            --border-color: #dde; /* Softened border */
-            --panel-bg-color: #f9fbfc; /* Light bg for panels */
-            --slider-thumb-color: var(--primary-color);
-            --slider-track-color: #cddcda;
-            --button-bg-color: var(--primary-color);
-            --button-text-color: #ffffff;
-            --link-color: var(--primary-color);
-            --code-bg-color: #e9ecef;
-        }
+        /* --- Styles unchanged --- */
+         :root { --primary-color: #3498db; --secondary-color: #2ecc71; --accent-color: #e74c3c; --highlight-color: #f1c40f; /* Yellow for highlight */ --text-color: #333; --light-text-color: #555; --bg-color: #f4f7f6; --container-bg: #ffffff; --border-color: #dde; --panel-bg-color: #f9fbfc; --slider-thumb-color: var(--primary-color); --slider-track-color: #cddcda; --button-bg-color: var(--primary-color); --button-text-color: #ffffff; --link-color: var(--primary-color); --code-bg-color: #e9ecef; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 10px; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
         .simulation-container { width: 100%; max-width: 850px; background-color: var(--container-bg); border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); padding: 20px; box-sizing: border-box; }
         .nav-link-home { display: block; text-align: left; margin-bottom: 15px; font-size: 0.9em; }
@@ -51,41 +35,16 @@
         .sim-button:hover { background-color: #2980b9; transform: translateY(-1px); }
         .sim-button:active { transform: translateY(0px); }
         canvas { border: 1px solid var(--border-color); background-color: #ffffff; display: block; width: 100%; height: 300px; border-radius: 8px; touch-action: none; margin-bottom: 20px; }
-
-        /* --- UPDATED Notes Section Styles --- */
-        .notes-section {
-            width: 100%; margin-top: 15px; margin-bottom: 20px;
-            border: 1px solid var(--border-color); border-radius: 8px;
-            background-color: var(--panel-bg-color);
-             overflow: hidden; /* Prevent content overflow when hidden */
-        }
-        .notes-header {
-             display: flex; justify-content: space-between; align-items: center;
-             padding: 12px 15px; border-bottom: 1px solid var(--border-color);
-             cursor: pointer; background-color: #fdfdfe; /* Slightly different from content */
-        }
+        /* Notes Section Styles */
+        .notes-section { width: 100%; margin-top: 15px; margin-bottom: 20px; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--panel-bg-color); overflow: hidden; }
+        .notes-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; background-color: #fdfdfe; }
         .notes-header h3 { margin: 0; font-weight: 600; color: var(--primary-color); font-size: 1em; flex-grow: 1; }
-        .notes-header::after { /* Custom Arrow */
-             content: '▸'; font-size: 1.2em; transition: transform 0.2s ease-in-out;
-             color: var(--light-text-color); margin-left: 10px;
-        }
-        .notes-section.notes-open .notes-header::after { /* Rotate arrow when open */
-            transform: rotate(90deg);
-        }
-        .notes-section.notes-open .notes-header { /* Optional: remove bottom border when open */
-             border-bottom-color: transparent;
-        }
-
-        .notes-content {
-             padding: 15px; font-size: 0.9em;
-             display: none; /* Hidden by default */
-             border-top: 1px solid var(--border-color); /* Separator */
-        }
-        .notes-section.notes-open .notes-content { /* Show when open */
-            display: block;
-        }
-        /* --- End of Updated Notes Styles --- */
-
+        .notes-header::after { content: '▸'; font-size: 1.2em; transition: transform 0.2s ease-in-out; color: var(--light-text-color); margin-left: 10px; }
+        .notes-section.notes-open .notes-header::after { transform: rotate(90deg); }
+        .notes-section.notes-open .notes-header { border-bottom-color: transparent; }
+        .notes-content { padding: 15px; font-size: 0.9em; display: none; border-top: 1px solid var(--border-color); }
+        .notes-section.notes-open .notes-content { display: block; }
+        /* Note Content Styles */
         .note-block { margin-bottom: 15px; } .note-block:last-child { margin-bottom: 0; }
         .note-block h4 { margin-top: 0; margin-bottom: 5px; font-weight: 600; color: var(--text-color); }
         .note-block ul { margin-top: 5px; margin-bottom: 10px; padding-left: 25px; }
@@ -93,16 +52,14 @@
         .note-block code { background-color: var(--code-bg-color); padding: 2px 5px; border-radius: 3px; font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; font-size: 0.95em; color: #333; }
         .note-block p > code, .note-block li > code { display: inline-block; }
         .note-block em { color: var(--light-text-color); font-size: 0.9em; }
-        /* Language toggle button */
-         .lang-button { padding: 3px 8px; font-size: 0.75em; background-color: #e9ecef; color: var(--light-text-color); border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; margin-left: 15px; transition: background-color 0.2s, color 0.2s; }
-         .lang-button:hover { background-color: #dde; color: var(--text-color); }
+        .lang-button { padding: 3px 8px; font-size: 0.75em; background-color: #e9ecef; color: var(--light-text-color); border: 1px solid #ced4da; border-radius: 4px; cursor: pointer; margin-left: 15px; transition: background-color 0.2s, color 0.2s; }
+        .lang-button:hover { background-color: #dde; color: var(--text-color); }
         footer { margin-top: 25px; text-align: center; font-size: 0.85em; color: #999; }
         footer a#creatorLink { color: #7f8c8d; font-weight: 500; text-decoration: none; transition: color 0.2s ease; }
         footer a#creatorLink:hover { color: var(--secondary-color); }
         /* Mobile */
         @media (max-width: 768px) { .simulation-container { padding: 15px; } h1 { font-size: 1.6em; margin-bottom: 15px; } .control-group { flex-direction: column; gap: 12px; } .control-item { flex-basis: auto; min-width: unset; width: 100%; } .control-item label, .wave-type-label-main { min-width: 80px; font-size: 0.85em;} .wave-type-options { justify-content: flex-start; } .wave-type-options label { margin-right: 10px; font-size: 0.85em; } .notes-header h3 { font-size: 0.9em; } .lang-button { font-size: 0.7em; padding: 2px 6px;} .notes-content { font-size: 0.85em;} .note-block code {font-size: 0.9em;} }
         @media (max-width: 480px) { body { padding: 5px; } .simulation-container { padding: 10px; } h1 { font-size: 1.4em; margin-bottom: 12px; } input[type="range"] { height: 10px; } input[type="range"]::-webkit-slider-thumb { width: 22px; height: 22px; } input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; } .control-item span.value-display { font-size: 0.8em; padding: 3px 5px; } .info-panel { font-size: 0.85em; padding: 6px 10px; } .sim-button { padding: 7px 15px; font-size: 0.85em; } footer { font-size: 0.8em; } .notes-header h3 { font-size: 0.85em; } .notes-content { font-size: 0.8em;} }
-
     </style>
 </head>
 <body>
@@ -127,14 +84,13 @@
         <canvas id="waveCanvas"></canvas>
 
         <!-- Notes and Equations Section -->
-        <!-- Using <section> instead of <details> for JS control -->
         <section id="notesSection" class="notes-section">
              <div class="notes-header">
                  <h3 data-lang-key="notesTitle">Key Concepts & Equations</h3>
                  <button id="langToggleButton" class="lang-button" title="Change notes language">தமிழ்</button>
              </div>
             <div class="notes-content">
-                <!-- Note content with data-lang-key attributes remains the same -->
+                <!-- Note content -->
                 <div class="note-block"> <h4 data-lang-key="waveTypesTitle">Wave Types</h4> <p data-lang-key="transverseDef"><strong>Transverse:</strong> Particle oscillation (↕) is perpendicular to wave propagation direction (↔). Example: Wave on a string.</p> <p data-lang-key="longitudinalDef"><strong>Longitudinal:</strong> Particle oscillation (↔) is parallel to wave propagation direction (↔), creating areas of compression (high density) and rarefaction (low density). Example: Sound waves.</p> </div>
                 <div class="note-block"> <h4 data-lang-key="motionTitle">Particle Motion vs. Wave Propagation</h4> <p data-lang-key="motionDesc">Particles in the medium oscillate around a fixed equilibrium position (Simple Harmonic Motion - SHM), shown by the dashed lines. They do <strong>not</strong> travel with the wave. The wave itself is the propagating pattern of disturbance, transferring energy through the medium.</p> </div>
                 <div class="note-block"> <h4 data-lang-key="equationsTitle">Fundamental Equations (for wave in +x direction)</h4> <ul> <li data-lang-key="eqDisp">Wave Displacement (Transverse y, Longitudinal ξ):<br><code>y(x,t)</code> or <code>ξ(x,t) = A sin(kx - ωt)</code></li> <li data-lang-key="eqSpeed">Wave Speed: <code>v = f * λ</code></li> <li data-lang-key="eqOmega">Angular Frequency: <code>ω = 2π * f</code> (rad/s)</li> <li data-lang-key="eqK">Wave Number: <code>k = 2π / λ</code> (rad/m)</li> <li data-lang-key="eqT">Period: <code>T = 1 / f</code> (s)</li> <li data-lang-key="eqVAlt">Alternate Speed Formula: <code>v = ω / k</code></li> </ul> <p data-lang-key="eqVars"><em>Where: A=Amplitude, f=Frequency, λ=Wavelength, t=Time, x=Position</em></p> </div>
@@ -150,7 +106,7 @@
     </footer>
 
     <script>
-        // --- Core simulation logic (No changes needed)---
+        // --- Core simulation logic ---
         const canvas = document.getElementById('waveCanvas');
         const ctx = canvas.getContext('2d');
         const canvasHeight = 300;
@@ -165,6 +121,7 @@
         const frequencyValueSpan = document.getElementById('frequencyValue');
         const numParticlesValueSpan = document.getElementById('numParticlesValue');
         const waveSpeedValueSpan = document.getElementById('waveSpeedValue');
+
         let currentWaveType = 'transverse';
         let amplitude, wavelength, frequency, numParticles;
         let angularFrequency, waveNumber, waveSpeed;
@@ -173,45 +130,152 @@
         let isPaused = false;
         let lastTimestamp = 0;
         let animationFrameId = null;
-        function updateParameters() { currentWaveType = document.querySelector('input[name="waveType"]:checked').value; amplitude = parseFloat(amplitudeSlider.value); wavelength = parseFloat(wavelengthSlider.value); frequency = parseFloat(frequencySlider.value); numParticles = parseInt(numParticlesSlider.value); amplitudeValueSpan.textContent = amplitude.toFixed(0); wavelengthValueSpan.textContent = wavelength.toFixed(0); frequencyValueSpan.textContent = frequency.toFixed(1); numParticlesValueSpan.textContent = numParticles; angularFrequency = 2 * Math.PI * frequency; waveNumber = 2 * Math.PI / wavelength; waveSpeed = frequency * wavelength; waveSpeedValueSpan.innerHTML = `${waveSpeed.toFixed(1)} m·s<sup>-1</sup>`; particles = []; if (numParticles > 0 && ctx.canvas.width > 0) { const effectiveCanvasWidth = ctx.canvas.width; const particleSpacing = effectiveCanvasWidth / (numParticles + 1); for (let i = 0; i < numParticles; i++) { particles.push({ originalX: particleSpacing * (i + 1) }); } } }
-        function drawEquilibriumLine(y_center) { ctx.beginPath(); ctx.moveTo(0, y_center); ctx.lineTo(ctx.canvas.width, y_center); ctx.strokeStyle = 'rgba(150, 150, 150, 0.6)'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]); }
-        function drawTransverseWaveShape() { ctx.beginPath(); const y_center = ctx.canvas.height / 2; let startY = y_center + amplitude * Math.sin(waveNumber * 0 - angularFrequency * time); ctx.moveTo(0, startY); for (let x = 1; x <= ctx.canvas.width; x++) { const y_offset = amplitude * Math.sin(waveNumber * x - angularFrequency * time); ctx.lineTo(x, y_center + y_offset); } ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(); ctx.lineWidth = 2; ctx.stroke(); }
-        function drawTransverseParticles() { const y_center = ctx.canvas.height / 2; const particleRadius = 5; particles.forEach(particle => { const equilibriumX = particle.originalX; ctx.beginPath(); ctx.moveTo(equilibriumX, y_center - amplitude); ctx.lineTo(equilibriumX, y_center + amplitude); ctx.strokeStyle = 'rgba(150, 150, 150, 0.4)'; ctx.setLineDash([2, 3]); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]); const y_offset = amplitude * Math.sin(waveNumber * equilibriumX - angularFrequency * time); const particleY = y_center + y_offset; ctx.beginPath(); ctx.arc(equilibriumX, particleY, particleRadius, 0, 2 * Math.PI); ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim(); ctx.fill(); }); }
-        function drawIntegratedLongitudinal(y_center) { const graphVisualAmplitude = Math.min(amplitude, y_center - 10); ctx.beginPath(); const initial_displacement_graph = amplitude * Math.sin(waveNumber * 0 - angularFrequency * time); const initial_y_offset_graph = (initial_displacement_graph / (amplitude || 1)) * graphVisualAmplitude; ctx.moveTo(0, y_center + initial_y_offset_graph); for (let x = 1; x <= ctx.canvas.width; x++) { const displacement_graph = amplitude * Math.sin(waveNumber * x - angularFrequency * time); const y_offset_graph = (displacement_graph / (amplitude || 1)) * graphVisualAmplitude; ctx.lineTo(x, y_center + y_offset_graph); } ctx.strokeStyle = 'rgba(0, 0, 255, 0.3)'; ctx.lineWidth = 2; ctx.stroke(); const particleBarHeight = 25; particles.forEach(particle => { const equilibriumX = particle.originalX; ctx.beginPath(); ctx.moveTo(equilibriumX - amplitude, y_center); ctx.lineTo(equilibriumX + amplitude, y_center); ctx.strokeStyle = 'rgba(150, 150, 150, 0.4)'; ctx.setLineDash([2, 3]); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]); const x_displacement = amplitude * Math.sin(waveNumber * equilibriumX - angularFrequency * time); const currentX = equilibriumX + x_displacement; ctx.beginPath(); ctx.moveTo(currentX, y_center - particleBarHeight / 2); ctx.lineTo(currentX, y_center + particleBarHeight / 2); ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim(); ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke(); ctx.lineCap = 'butt'; }); }
-        function animate(timestamp) { if (!isPaused && !lastTimestamp) lastTimestamp = timestamp; if (isPaused && lastTimestamp) lastTimestamp = 0; let deltaTime = 0; if (!isPaused && lastTimestamp) { deltaTime = (timestamp - lastTimestamp) / 1000; } if (timestamp > lastTimestamp || isPaused) { lastTimestamp = timestamp; } if (!isPaused) { if (!isNaN(deltaTime) && deltaTime > 0 && deltaTime < 0.5) { time += deltaTime; } } ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); const y_center = ctx.canvas.height / 2; drawEquilibriumLine(y_center); if (currentWaveType === 'transverse') { drawTransverseWaveShape(); drawTransverseParticles(); } else if (currentWaveType === 'longitudinal') { drawIntegratedLongitudinal(y_center); } if (!isPaused) { animationFrameId = requestAnimationFrame(animate); } else { if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null; } }
+        let highlightedParticleIndex = -1; // Index of particle to highlight (-1 means none initially)
+
+        function updateParameters() {
+            currentWaveType = document.querySelector('input[name="waveType"]:checked').value;
+            amplitude = parseFloat(amplitudeSlider.value);
+            wavelength = parseFloat(wavelengthSlider.value);
+            frequency = parseFloat(frequencySlider.value);
+            numParticles = parseInt(numParticlesSlider.value);
+
+            amplitudeValueSpan.textContent = amplitude.toFixed(0);
+            wavelengthValueSpan.textContent = wavelength.toFixed(0);
+            frequencyValueSpan.textContent = frequency.toFixed(1);
+            numParticlesValueSpan.textContent = numParticles;
+
+            angularFrequency = 2 * Math.PI * frequency;
+            waveNumber = 2 * Math.PI / wavelength;
+            waveSpeed = frequency * wavelength;
+            waveSpeedValueSpan.innerHTML = `${waveSpeed.toFixed(1)} m·s<sup>-1</sup>`;
+
+            particles = [];
+            highlightedParticleIndex = -1; // Reset highlight
+            if (numParticles > 0 && ctx.canvas.width > 0) {
+                const effectiveCanvasWidth = ctx.canvas.width;
+                const particleSpacing = effectiveCanvasWidth / (numParticles + 1);
+                for (let i = 0; i < numParticles; i++) {
+                    particles.push({ originalX: particleSpacing * (i + 1) });
+                }
+                 // Calculate index of middle particle to highlight
+                 if (numParticles > 0) {
+                    highlightedParticleIndex = Math.floor((numParticles -1) / 2); // Use floor for even/odd count
+                 }
+            }
+            if (!isPaused && animationFrameId === null) { lastTimestamp = performance.now(); animationFrameId = requestAnimationFrame(animate); } else if (!isPaused) { /* running */ } else { drawFrame(); }
+        }
+
+        function drawEquilibriumLine(y_center) {
+            ctx.beginPath(); ctx.moveTo(0, y_center); ctx.lineTo(ctx.canvas.width, y_center);
+            ctx.strokeStyle = 'rgba(150, 150, 150, 0.6)'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
+        }
+
+        function drawTransverseWaveShape() {
+            ctx.beginPath(); const y_center = ctx.canvas.height / 2; let startY = y_center + amplitude * Math.sin(waveNumber * 0 - angularFrequency * time); ctx.moveTo(0, startY);
+            for (let x = 1; x <= ctx.canvas.width; x++) { const y_offset = amplitude * Math.sin(waveNumber * x - angularFrequency * time); ctx.lineTo(x, y_center + y_offset); }
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(); ctx.lineWidth = 2; ctx.stroke();
+        }
+
+        function drawTransverseParticles() {
+            const y_center = ctx.canvas.height / 2;
+            const particleRadius = 5;
+            const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+            const highlightColor = getComputedStyle(document.documentElement).getPropertyValue('--highlight-color').trim();
+
+            particles.forEach((particle, index) => { // Get index here
+                const equilibriumX = particle.originalX;
+                // SHM Path (Vertical) - Same for all
+                ctx.beginPath(); ctx.moveTo(equilibriumX, y_center - amplitude); ctx.lineTo(equilibriumX, y_center + amplitude);
+                ctx.strokeStyle = 'rgba(150, 150, 150, 0.4)'; ctx.setLineDash([2, 3]); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
+
+                // Particle
+                const y_offset = amplitude * Math.sin(waveNumber * equilibriumX - angularFrequency * time);
+                const particleY = y_center + y_offset;
+
+                // Set fill style based on index
+                ctx.fillStyle = (index === highlightedParticleIndex) ? highlightColor : defaultColor;
+
+                ctx.beginPath(); ctx.arc(equilibriumX, particleY, particleRadius, 0, 2 * Math.PI);
+                ctx.fill(); // Use the fillStyle set above
+                // Optional: Add outline if needed
+                 // if(index === highlightedParticleIndex){
+                 //    ctx.strokeStyle = 'black';
+                 //    ctx.lineWidth = 1;
+                 //    ctx.stroke();
+                 //}
+            });
+        }
+
+        function drawIntegratedLongitudinal(y_center) {
+            const graphVisualAmplitude = Math.min(amplitude, y_center - 10);
+            const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim();
+            const highlightColor = getComputedStyle(document.documentElement).getPropertyValue('--highlight-color').trim();
+
+            // 1. Draw Displacement Graph (Background)
+            ctx.beginPath(); const initial_displacement_graph = amplitude * Math.sin(waveNumber * 0 - angularFrequency * time); const initial_y_offset_graph = (initial_displacement_graph / (amplitude || 1)) * graphVisualAmplitude; ctx.moveTo(0, y_center + initial_y_offset_graph);
+            for (let x = 1; x <= ctx.canvas.width; x++) { const displacement_graph = amplitude * Math.sin(waveNumber * x - angularFrequency * time); const y_offset_graph = (displacement_graph / (amplitude || 1)) * graphVisualAmplitude; ctx.lineTo(x, y_center + y_offset_graph); }
+            ctx.strokeStyle = 'rgba(0, 0, 255, 0.3)'; ctx.lineWidth = 2; ctx.stroke();
+
+            // 2. Draw Particles and SHM Paths
+            const particleBarHeight = 25;
+            particles.forEach((particle, index) => { // Get index here
+                const equilibriumX = particle.originalX;
+                // SHM Path (Horizontal) - Same for all
+                ctx.beginPath(); ctx.moveTo(equilibriumX - amplitude, y_center); ctx.lineTo(equilibriumX + amplitude, y_center);
+                ctx.strokeStyle = 'rgba(150, 150, 150, 0.4)'; ctx.setLineDash([2, 3]); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
+
+                // Particle
+                const x_displacement = amplitude * Math.sin(waveNumber * equilibriumX - angularFrequency * time);
+                const currentX = equilibriumX + x_displacement;
+
+                 // Set stroke style based on index
+                 ctx.strokeStyle = (index === highlightedParticleIndex) ? highlightColor : defaultColor;
+
+                ctx.beginPath(); ctx.moveTo(currentX, y_center - particleBarHeight / 2); ctx.lineTo(currentX, y_center + particleBarHeight / 2);
+                ctx.lineWidth = (index === highlightedParticleIndex) ? 4 : 3; // Make highlight slightly thicker
+                ctx.lineCap = 'round';
+                ctx.stroke(); // Use the strokeStyle set above
+                ctx.lineCap = 'butt'; // Reset
+            });
+        }
+
+        function drawFrame() {
+             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+             const y_center = ctx.canvas.height / 2;
+             drawEquilibriumLine(y_center);
+             if (currentWaveType === 'transverse') { drawTransverseWaveShape(); drawTransverseParticles(); }
+             else if (currentWaveType === 'longitudinal') { drawIntegratedLongitudinal(y_center); }
+             else { console.error("Unknown wave type in drawFrame:", currentWaveType); }
+        }
+
+        function animate(timestamp) { /* ... animation logic remains the same ... */ if (!isPaused && !lastTimestamp) lastTimestamp = timestamp; if (isPaused && lastTimestamp) lastTimestamp = 0; let deltaTime = 0; if (!isPaused && lastTimestamp) { deltaTime = (timestamp - lastTimestamp) / 1000; } if (timestamp > lastTimestamp || isPaused) { lastTimestamp = timestamp; } if (!isPaused) { if (!isNaN(deltaTime) && deltaTime > 0 && deltaTime < 0.5) { time += deltaTime; } } drawFrame(); if (!isPaused) { animationFrameId = requestAnimationFrame(animate); } else { if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null; } }
 
         // --- Language Switching Logic ---
         const langToggleButton = document.getElementById('langToggleButton');
         let currentNotesLanguage = 'en';
-        const languageData = { /* ... Language data (Please double-check Tamil!) ... */
-             notesTitle: { en: "Key Concepts & Equations", ta: "முக்கிய கருத்துகள் & சமன்பாடுகள்" }, waveTypesTitle: { en: "Wave Types", ta: "அலை வகைகள்" }, transverseDef: { en: "<strong>Transverse:</strong> Particle oscillation (↕) is perpendicular to wave propagation direction (↔). Example: Wave on a string.", ta: "<strong>குறுக்கு:</strong> துகள் அதிர்வு (↕) அலை பரவும் திசைக்கு (↔) செங்குத்தாக இருக்கும். எடுத்துக்காட்டு: கயிற்றில் அலை." }, longitudinalDef: { en: "<strong>Longitudinal:</strong> Particle oscillation (↔) is parallel to wave propagation direction (↔), creating areas of compression (high density) and rarefaction (low density). Example: Sound waves.", ta: "<strong>நீளவாட்டு:</strong> துகள் அதிர்வு (↔) அலை பரவும் திசைக்கு (↔) இணையாக இருக்கும், நெரிசல் (அதிக அடர்த்தி) மற்றும் நெகிழ்ச்சி (குறைந்த அடர்த்தி) பகுதிகளை உருவாக்குகிறது. எடுத்துக்காட்டு: ஒலி அலைகள்." }, motionTitle: { en: "Particle Motion vs. Wave Propagation", ta: "துகள் இயக்கம் vs. அலை பரவல்" }, motionDesc: { en: "Particles in the medium oscillate around a fixed equilibrium position (Simple Harmonic Motion - SHM), shown by the dashed lines. They do <strong>not</strong> travel with the wave. The wave itself is the propagating pattern of disturbance, transferring energy through the medium.", ta: "ஊடகத்தில் உள்ள துகள்கள் ஒரு நிலையான சமநிலை நிலையைச் சுற்றி (எளிய இசை இயக்கம் - SHM) அலைகின்றன (கோடிட்ட கோடுகள் காட்டுகின்றன). அவை அலையுடன் பயணம் <strong>செய்வதில்லை</strong>. அலையே பரவும் இடையூறு வடிவமாகும், இது ஊடகத்தின் வழியாக ஆற்றலைக் கடத்துகிறது." }, equationsTitle: { en: "Fundamental Equations (for wave in +x direction)", ta: "அடிப்படை சமன்பாடுகள் (+x திசையில் அலை)" }, eqDisp: { en: "Wave Displacement (Transverse y, Longitudinal ξ):<br><code>y(x,t)</code> or <code>ξ(x,t) = A sin(kx - ωt)</code>", ta: "அலை இடப்பெயர்ச்சி (குறுக்கு y, நீளவாட்டு ξ):<br><code>y(x,t)</code> or <code>ξ(x,t) = A sin(kx - ωt)</code>" }, eqSpeed: { en: "Wave Speed: <code>v = f * λ</code>", ta: "அலை வேகம்: <code>v = f * λ</code>" }, eqOmega: { en: "Angular Frequency: <code>ω = 2π * f</code> (rad/s)", ta: "கோண அதிர்வெண்: <code>ω = 2π * f</code> (rad/s)" }, eqK: { en: "Wave Number: <code>k = 2π / λ</code> (rad/m)", ta: "அலை எண்: <code>k = 2π / λ</code> (rad/m)" }, eqT: { en: "Period: <code>T = 1 / f</code> (s)", ta: "அலைவு காலம்: <code>T = 1 / f</code> (s)" }, eqVAlt: { en: "Alternate Speed Formula: <code>v = ω / k</code>", ta: "மாற்று வேக சூத்திரம்: <code>v = ω / k</code>" }, eqVars: { en: "<em>Where: A=Amplitude, f=Frequency, λ=Wavelength, t=Time, x=Position</em>", ta: "<em>இங்கு: A=வீச்சு, f=அதிர்வெண், λ=அலைநீளம், t=நேரம், x=நிலை</em>" }, tipsTitle: { en: "Simulation Tips", ta: " உருவகப்படுத்துதல் குறிப்புகள்" }, tipPause: { en: "Click 'Pause' to freeze the wave and examine the SHM paths (dashed lines) for individual particles.", ta: "'இடைநிறுத்து' என்பதைக் கிளிக் செய்து அலையை உறையவைத்து, தனிப்பட்ட துகள்களின் SHM பாதைகளை (கோடிட்ட கோடுகள்) ஆராயவும்." }, tipCompress: { en: "In Longitudinal mode, observe how compressions (dense bars) align with regions where the displacement (ξ) graph has the steepest negative slope.", ta: "நீளவாட்டு முறையில், இடப்பெயர்ச்சி (ξ) வரைபடம் செங்குத்தான எதிர்மறை சரிவைக் கொண்டிருக்கும் பகுதிகளுடன் நெரிசல்கள் (அடர்ந்த கம்பிகள்) எவ்வாறு ஒத்துப்போகின்றன என்பதைக் கவனியுங்கள்." }, tipSpeed: { en: "Adjust Frequency (f) and Wavelength (λ) to see their effect on Wave Speed (v).", ta: "அதிர்வெண் (f) மற்றும் அலைநீளம் (λ) ஆகியவற்றைச் சரிசெய்து அலை வேகத்தில் (v) அவற்றின் விளைவைக் காணவும்." }
-        };
+        const languageData = { /* ... Language data ... */ notesTitle: { en: "Key Concepts & Equations", ta: "முக்கிய கருத்துகள் & சமன்பாடுகள்" }, waveTypesTitle: { en: "Wave Types", ta: "அலை வகைகள்" }, transverseDef: { en: "<strong>Transverse:</strong> Particle oscillation (↕) is perpendicular to wave propagation direction (↔). Example: Wave on a string.", ta: "<strong>குறுக்கு:</strong> துகள் அதிர்வு (↕) அலை பரவும் திசைக்கு (↔) செங்குத்தாக இருக்கும். எடுத்துக்காட்டு: கயிற்றில் அலை." }, longitudinalDef: { en: "<strong>Longitudinal:</strong> Particle oscillation (↔) is parallel to wave propagation direction (↔), creating areas of compression (high density) and rarefaction (low density). Example: Sound waves.", ta: "<strong>நீளவாட்டு:</strong> துகள் அதிர்வு (↔) அலை பரவும் திசைக்கு (↔) இணையாக இருக்கும், நெரிசல் (அதிக அடர்த்தி) மற்றும் நெகிழ்ச்சி (குறைந்த அடர்த்தி) பகுதிகளை உருவாக்குகிறது. எடுத்துக்காட்டு: ஒலி அலைகள்." }, motionTitle: { en: "Particle Motion vs. Wave Propagation", ta: "துகள் இயக்கம் vs. அலை பரவல்" }, motionDesc: { en: "Particles in the medium oscillate around a fixed equilibrium position (Simple Harmonic Motion - SHM), shown by the dashed lines. They do <strong>not</strong> travel with the wave. The wave itself is the propagating pattern of disturbance, transferring energy through the medium.", ta: "ஊடகத்தில் உள்ள துகள்கள் ஒரு நிலையான சமநிலை நிலையைச் சுற்றி (எளிய இசை இயக்கம் - SHM) அலைகின்றன (கோடிட்ட கோடுகள் காட்டுகின்றன). அவை அலையுடன் பயணம் <strong>செய்வதில்லை</strong>. அலையே பரவும் இடையூறு வடிவமாகும், இது ஊடகத்தின் வழியாக ஆற்றலைக் கடத்துகிறது." }, equationsTitle: { en: "Fundamental Equations (for wave in +x direction)", ta: "அடிப்படை சமன்பாடுகள் (+x திசையில் அலை)" }, eqDisp: { en: "Wave Displacement (Transverse y, Longitudinal ξ):<br><code>y(x,t)</code> or <code>ξ(x,t) = A sin(kx - ωt)</code>", ta: "அலை இடப்பெயர்ச்சி (குறுக்கு y, நீளவாட்டு ξ):<br><code>y(x,t)</code> or <code>ξ(x,t) = A sin(kx - ωt)</code>" }, eqSpeed: { en: "Wave Speed: <code>v = f * λ</code>", ta: "அலை வேகம்: <code>v = f * λ</code>" }, eqOmega: { en: "Angular Frequency: <code>ω = 2π * f</code> (rad/s)", ta: "கோண அதிர்வெண்: <code>ω = 2π * f</code> (rad/s)" }, eqK: { en: "Wave Number: <code>k = 2π / λ</code> (rad/m)", ta: "அலை எண்: <code>k = 2π / λ</code> (rad/m)" }, eqT: { en: "Period: <code>T = 1 / f</code> (s)", ta: "அலைவு காலம்: <code>T = 1 / f</code> (s)" }, eqVAlt: { en: "Alternate Speed Formula: <code>v = ω / k</code>", ta: "மாற்று வேக சூத்திரம்: <code>v = ω / k</code>" }, eqVars: { en: "<em>Where: A=Amplitude, f=Frequency, λ=Wavelength, t=Time, x=Position</em>", ta: "<em>இங்கு: A=வீச்சு, f=அதிர்வெண், λ=அலைநீளம், t=நேரம், x=நிலை</em>" }, tipsTitle: { en: "Simulation Tips", ta: " உருவகப்படுத்துதல் குறிப்புகள்" }, tipPause: { en: "Click 'Pause' to freeze the wave and examine the SHM paths (dashed lines) for individual particles.", ta: "'இடைநிறுத்து' என்பதைக் கிளிக் செய்து அலையை உறையவைத்து, தனிப்பட்ட துகள்களின் SHM பாதைகளை (கோடிட்ட கோடுகள்) ஆராயவும்." }, tipCompress: { en: "In Longitudinal mode, observe how compressions (dense bars) align with regions where the displacement (ξ) graph has the steepest negative slope.", ta: "நீளவாட்டு முறையில், இடப்பெயர்ச்சி (ξ) வரைபடம் செங்குத்தான எதிர்மறை சரிவைக் கொண்டிருக்கும் பகுதிகளுடன் நெரிசல்கள் (அடர்ந்த கம்பிகள்) எவ்வாறு ஒத்துப்போகின்றன என்பதைக் கவனியுங்கள்." }, tipSpeed: { en: "Adjust Frequency (f) and Wavelength (λ) to see their effect on Wave Speed (v).", ta: "அதிர்வெண் (f) மற்றும் அலைநீளம் (λ) ஆகியவற்றைச் சரிசெய்து அலை வேகத்தில் (v) அவற்றின் விளைவைக் காணவும்." } };
         function updateNotesLanguage(lang) { document.querySelectorAll('[data-lang-key]').forEach(element => { const key = element.getAttribute('data-lang-key'); if (languageData[key] && languageData[key][lang]) { element.innerHTML = languageData[key][lang]; } }); langToggleButton.textContent = lang === 'en' ? 'தமிழ்' : 'English'; }
         langToggleButton.addEventListener('click', (event) => { event.stopPropagation(); currentNotesLanguage = (currentNotesLanguage === 'en') ? 'ta' : 'en'; updateNotesLanguage(currentNotesLanguage); });
 
-        // --- Initial Setup ---
+        // --- Event Listeners ---
         function resizeCanvas() { canvas.width = canvas.offsetWidth; canvas.height = canvasHeight; updateParameters(); }
+        window.addEventListener('resize', resizeCanvas);
+        waveTypeRadios.forEach(radio => radio.addEventListener('change', updateParameters));
+        amplitudeSlider.addEventListener('input', updateParameters);
+        wavelengthSlider.addEventListener('input', updateParameters);
+        frequencySlider.addEventListener('input', updateParameters);
+        numParticlesSlider.addEventListener('input', updateParameters);
+        pausePlayButton.addEventListener('click', () => { isPaused = !isPaused; pausePlayButton.textContent = isPaused ? 'Play' : 'Pause'; if (!isPaused) { lastTimestamp = performance.now(); if(!animationFrameId) animationFrameId = requestAnimationFrame(animate);} else { if(animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null; } });
+
+        // --- Initial Setup ---
         document.addEventListener('DOMContentLoaded', () => {
             resizeCanvas();
-            updateNotesLanguage(currentNotesLanguage); // Set initial notes language
-
+            updateNotesLanguage(currentNotesLanguage);
             const notesSection = document.getElementById('notesSection');
             const notesHeader = notesSection.querySelector('.notes-header');
-            const langButton = document.getElementById('langToggleButton'); // Get reference to button
-
-            if (notesHeader && notesSection) {
-                notesHeader.addEventListener('click', (event) => {
-                    // Only toggle if the click was not on the language button itself
-                    if (event.target !== langButton && !langButton.contains(event.target)) {
-                        notesSection.classList.toggle('notes-open');
-                    }
-                });
-            }
-
-             if (!isPaused) {
-                 lastTimestamp = performance.now();
-                 animationFrameId = requestAnimationFrame(animate);
-             }
+            const langButton = document.getElementById('langToggleButton');
+            if (notesHeader && notesSection) { notesHeader.addEventListener('click', (event) => { if (event.target !== langButton && !langButton.contains(event.target)) { notesSection.classList.toggle('notes-open'); } }); }
+             if (!isPaused) { lastTimestamp = performance.now(); animationFrameId = requestAnimationFrame(animate); } else { drawFrame(); }
         });
 
     </script>
