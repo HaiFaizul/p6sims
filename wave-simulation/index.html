@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Wave Simulation</title>
+    <title>Interactive Wave Simulation - Hai</title>
     <style>
         :root {
             --primary-color: #3498db;  /* Blue */
             --secondary-color: #2ecc71; /* Green */
-            --accent-color: #e74c3c;   /* Red */
+            --accent-color: #e74c3c;   /* Red for transverse particles */
+            --highlight-particle-color: #f1c40f; /* Yellow for highlighted longitudinal particle */
             --text-color: #333;
             --bg-color: #f4f7f6;
             --container-bg: #ffffff;
@@ -268,7 +269,7 @@
 <body>
     <div class="simulation-container">
         <div class="nav-link-home">
-            <a href="../index.html">← Back to p6sims Home</a>
+            <a href="../index.html">&larr; Back to p6sims Home</a>
         </div>
         <h1>Interactive Wave Simulation</h1>
 
@@ -288,7 +289,7 @@
             <div class="control-group">
                 <div class="control-item">
                     <label for="amplitude">Amplitude (A):</label>
-                    <input type="range" id="amplitude" min="5" max="50" value="30"> <!-- Max amplitude reduced for longitudinal graph -->
+                    <input type="range" id="amplitude" min="5" max="50" value="30">
                     <span id="amplitudeValue" class="value-display">30</span>
                 </div>
                 <div class="control-item">
@@ -330,12 +331,11 @@
         const canvas = document.getElementById('waveCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Let's use a consistent height, but ensure amplitude isn't too large for longitudinal display
-        const canvasHeight = 300; // Consistent height
+        const canvasHeight = 300;
 
         function resizeCanvas() {
             canvas.width = canvas.offsetWidth;
-            canvas.height = canvasHeight; // Keep height consistent
+            canvas.height = canvasHeight;
             updateParameters();
         }
         window.addEventListener('resize', resizeCanvas);
@@ -361,13 +361,10 @@
         let particles = [];
         let isPaused = false;
         let lastTimestamp = 0;
+        let highlightedParticleIndex = -1; // Index of the particle to highlight
 
         function updateParameters() {
             currentWaveType = document.querySelector('input[name="waveType"]:checked').value;
-
-            // Adjust max amplitude dynamically for longitudinal if needed, or just advise user
-            // For now, we'll cap the drawn amplitude in the longitudinal graph.
-            // The slider's max value is also reduced for 'amplitude' input.
 
             amplitude = parseFloat(amplitudeSlider.value);
             wavelength = parseFloat(wavelengthSlider.value);
@@ -394,10 +391,18 @@
                         originalX: particleSpacing * (i + 1)
                     });
                 }
+                // Select a particle to highlight, e.g., the middle one or first if few particles
+                if (particles.length > 0) {
+                    highlightedParticleIndex = Math.floor(particles.length / 2);
+                } else {
+                    highlightedParticleIndex = -1;
+                }
+            } else {
+                 highlightedParticleIndex = -1;
             }
         }
 
-        waveTypeRadios.forEach(radio => radio.addEventListener('change', updateParameters)); // Just update params, no resize needed if height is fixed
+        waveTypeRadios.forEach(radio => radio.addEventListener('change', updateParameters));
         amplitudeSlider.addEventListener('input', updateParameters);
         wavelengthSlider.addEventListener('input', updateParameters);
         frequencySlider.addEventListener('input', updateParameters);
@@ -431,7 +436,7 @@
             const y_center = ctx.canvas.height / 2;
             const particleRadius = 5;
 
-            particles.forEach(particle => {
+            particles.forEach((particle, index) => { // Added index here, though not used for transverse highlight yet
                 const equilibriumX = particle.originalX;
 
                 // SHM Path (Vertical)
@@ -449,40 +454,36 @@
 
                 ctx.beginPath();
                 ctx.arc(equilibriumX, particleY, particleRadius, 0, 2 * Math.PI);
+                // Example: If you wanted to highlight a transverse particle too
+                // ctx.fillStyle = (index === highlightedParticleIndex && currentWaveType === 'transverse') ? 
+                //                 getComputedStyle(document.documentElement).getPropertyValue('--highlight-particle-color').trim() :
+                //                 getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
                 ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
                 ctx.fill();
             });
         }
 
         function drawIntegratedLongitudinal(y_center) {
-            // 1. Draw Displacement Graph (ξ vs x) as background
-            // The 'amplitude' here is the particle displacement amplitude (A_sim)
-            // The visual amplitude of this graph on screen (y-axis) is also 'amplitude'
-            // Ensure this 'amplitude' is not > y_center to avoid going off canvas.
-            const graphVisualAmplitude = Math.min(amplitude, y_center - 10); // Cap visual amplitude, -10 for padding
+            const graphVisualAmplitude = Math.min(amplitude, y_center - 10);
 
             ctx.beginPath();
             const initial_displacement_graph = amplitude * Math.sin(waveNumber * 0 - angularFrequency * time);
-            // Scale the displacement for drawing
             const initial_y_offset_graph = (initial_displacement_graph / (amplitude || 1)) * graphVisualAmplitude;
             ctx.moveTo(0, y_center + initial_y_offset_graph);
 
             for (let x = 1; x <= ctx.canvas.width; x++) {
                 const displacement_graph = amplitude * Math.sin(waveNumber * x - angularFrequency * time);
-                // Scale the displacement for drawing
                 const y_offset_graph = (displacement_graph / (amplitude || 1)) * graphVisualAmplitude;
                 ctx.lineTo(x, y_center + y_offset_graph);
             }
-            ctx.strokeStyle = 'rgba(0, 0, 255, 0.3)'; // Lighter blue for background graph
+            ctx.strokeStyle = 'rgba(0, 0, 255, 0.3)';
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // 2. Draw Particles and their SHM paths
             const particleBarHeight = 25;
-            particles.forEach(particle => {
+            particles.forEach((particle, index) => { // Added index to the loop
                 const equilibriumX = particle.originalX;
 
-                // SHM Path (Horizontal) - centered around y_center
                 ctx.beginPath();
                 ctx.moveTo(equilibriumX - amplitude, y_center);
                 ctx.lineTo(equilibriumX + amplitude, y_center);
@@ -492,15 +493,20 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // Particle's actual horizontal displacement ξ
                 const x_displacement = amplitude * Math.sin(waveNumber * equilibriumX - angularFrequency * time);
                 const currentX = equilibriumX + x_displacement;
 
-                // Draw particle as a vertical bar
                 ctx.beginPath();
                 ctx.moveTo(currentX, y_center - particleBarHeight / 2);
                 ctx.lineTo(currentX, y_center + particleBarHeight / 2);
-                ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim();
+
+                // Set particle color: highlighted or default
+                if (index === highlightedParticleIndex) {
+                    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--highlight-particle-color').trim();
+                } else {
+                    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim();
+                }
+
                 ctx.lineWidth = 3;
                 ctx.lineCap = 'round';
                 ctx.stroke();
@@ -530,10 +536,10 @@
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
             if (currentWaveType === 'transverse') {
-                drawTransverseWaveShape(); // Background wave
-                drawTransverseParticles();   // Particles on top
+                drawTransverseWaveShape();
+                drawTransverseParticles();
             } else if (currentWaveType === 'longitudinal') {
-                const y_center = ctx.canvas.height / 2; // Use a single y_center
+                const y_center = ctx.canvas.height / 2;
                 drawIntegratedLongitudinal(y_center);
             }
 
@@ -546,7 +552,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            resizeCanvas(); // This also calls updateParameters
+            resizeCanvas();
             if (!isPaused) {
                 lastTimestamp = performance.now();
                 animationFrameId = requestAnimationFrame(animate);
