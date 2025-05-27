@@ -9,11 +9,11 @@
             --primary-color: #3498db; --secondary-color: #2ecc71;
             --accent-color-wave: #e74c3c; --accent-color-placeholder: #95a5a6;
             --accent-color-shm: #f1c40f; 
+            --accent-color-superposition: #9b59b6; /* Purple for superposition */
             --text-color: #333; --light-text-color: #555; --bg-color: #f4f7f6;
             --card-bg-color: #ffffff; --border-color: #e0e6e5;
             --hover-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             --card-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-            /* Added from wave sim for consistency if footer links are styled same */
             --link-color: var(--primary-color);
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); line-height: 1.7; }
@@ -41,6 +41,8 @@
         .wave-sim-thumbnail::before { content: "〰️"; font-size: 3em; opacity: 0.7; }
         .shm-sim-thumbnail { background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color-shm) 100%); }
         .shm-sim-thumbnail::before { content: "⇄"; font-size: 3em; opacity: 0.7; font-family: "Apple Symbols", "Segoe UI Symbol", "Noto Color Emoji"; }
+        .superposition-sim-thumbnail { background: linear-gradient(135deg, var(--accent-color-superposition) 0%, var(--primary-color) 100%); }
+        .superposition-sim-thumbnail::before { content: "∿"; font-size: 3em; opacity: 0.7; font-family: "Apple Symbols", "Segoe UI Symbol", "Noto Color Emoji"; }
         .placeholder-card .card-thumbnail-area { background: linear-gradient(45deg, #ecf0f1, var(--accent-color-placeholder)); }
         .placeholder-card .card-thumbnail-area::before { content: "💡"; font-size: 3em; opacity: 0.7; }
         .simulation-card .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
@@ -51,31 +53,19 @@
         .placeholder-card .card-content { text-align: center; }
         .placeholder-card h3 { color: var(--light-text-color); }
         /* Footer */
-        .site-footer {
-            text-align: center; padding: 30px 20px;
-            border-top: 1px solid var(--border-color); font-size: 0.9em;
-            color: var(--light-text-color);
-        }
-        /* Copied footer link style from simulation pages for creator link */
-        .site-footer a#creatorLinkTopic, .site-footer a {
-            color: #7f8c8d; /* Same as individual sim pages for consistency or use var(--primary-color) if preferred */
-            font-weight: 500;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-        .site-footer a#creatorLinkTopic:hover, .site-footer a:hover {
-            color: var(--secondary-color); /* Green on hover or var(--primary-color) */
-        }
+        .site-footer { text-align: center; padding: 30px 20px; border-top: 1px solid var(--border-color); font-size: 0.9em; color: var(--light-text-color); }
+        .site-footer a#creatorLinkTopic, .site-footer a { color: #7f8c8d; font-weight: 500; text-decoration: none; transition: color 0.2s ease; }
+        .site-footer a#creatorLinkTopic:hover, .site-footer a:hover { color: var(--secondary-color); }
         /* Responsive */
         @media (max-width: 768px) { .page-header h1 { font-size: 2em; } .site-header .container { flex-direction: column; gap: 10px;} .nav-links { margin-top: 10px; } .nav-links a { margin-left: 0; margin-right: 15px;} }
-        @media (max-width: 480px) { .page-header h1 { font-size: 1.7em; } .logo { font-size: 1.6em; } .card-thumbnail-area { height: 150px; font-size: 1.3em; } .wave-sim-thumbnail::before, .placeholder-card .card-thumbnail-area::before, .shm-sim-thumbnail::before { font-size: 2.5em; } .simulation-card h3 { font-size: 1.2em; } .simulation-card p { font-size: 0.9em; } .simulation-card .btn { padding: 8px 15px; font-size: 0.9em;} }
+        @media (max-width: 480px) { .page-header h1 { font-size: 1.7em; } .logo { font-size: 1.6em; } .card-thumbnail-area { height: 150px; font-size: 1.3em; } .wave-sim-thumbnail::before, .placeholder-card .card-thumbnail-area::before, .shm-sim-thumbnail::before, .superposition-sim-thumbnail::before { font-size: 2.5em; } .simulation-card h3 { font-size: 1.2em; } .simulation-card p { font-size: 0.9em; } .simulation-card .btn { padding: 8px 15px; font-size: 0.9em;} }
     </style>
 </head>
 <body>
 
     <header class="site-header">
         <div class="container">
-            <a href="../p6sims" class="logo">p6<span>sims</span></a>
+            <a href="../index.html" class="logo">p6<span>sims</span></a>
             <nav class="nav-links">
                 <a href="../index.html#simulations">All Simulations</a>
                 <a href="../index.html#about">About</a>
@@ -87,7 +77,7 @@
          <div class="container">
             <h1>Waves & Vibration</h1>
              <div class="breadcrumb">
-                 <a href="../p6sims">← Back to All Topics</a>
+                 <a href="../index.html">← Back to All Topics</a>
              </div>
         </div>
     </section>
@@ -95,6 +85,7 @@
     <main class="main-content container">
         <div class="simulations-grid">
 
+            <!-- Card for Basic Wave Properties simulation -->
             <div class="simulation-card">
                 <div class="card-thumbnail-area wave-sim-thumbnail"></div>
                 <div class="card-content">
@@ -104,30 +95,45 @@
                 </div>
             </div>
 
+            <!-- Card for SHM Simulation -->
             <div class="simulation-card">
                 <div class="card-thumbnail-area shm-sim-thumbnail"></div>
                 <div class="card-content">
                     <h3>Simple Harmonic Motion (SHM)</h3>
-                    <p>Explore SHM, its derivation from Uniform Circular Motion, and analyze displacement, velocity, and acceleration graphs and vectors.</p>
+                    <p>Explore SHM, its derivation from Uniform Circular Motion, and analyze displacement, velocity, and acceleration.</p>
                     <a href="waves_and_vibration/2_shm_circular_motion/index.html" class="btn">Launch Simulation</a>
                 </div>
             </div>
+            
+            <!-- NEW Card for Superposition & Interference Simulation -->
+            <div class="simulation-card">
+                <div class="card-thumbnail-area superposition-sim-thumbnail">
+                    <!-- Visual hint for superposition -->
+                </div>
+                <div class="card-content">
+                    <h3>Wave Superposition & Interference</h3>
+                    <p>Combine two waves and observe constructive/destructive interference, beats, and the principle of superposition.</p>
+                    <a href="waves_and_vibration/3_superposition_interference/index.html" class="btn">Launch Simulation</a>
+                </div>
+            </div>
+            <!-- ********************************************* -->
 
              <div class="simulation-card placeholder-card">
                  <div class="card-thumbnail-area"></div>
                  <div class="card-content">
-                    <h3>Superposition & Interference (Coming Soon)</h3>
-                    <p>Explore how waves combine when they overlap.</p>
+                    <h3>Standing Waves (Coming Soon!)</h3> <!-- Example next sim -->
+                    <p>Investigate how waves reflecting and interfering can create stationary patterns with nodes and antinodes.</p>
                 </div>
             </div>
+
+            <!-- Add more cards for simulations within this topic as needed -->
+
         </div>
     </main>
 
     <footer class="site-footer">
         <div class="container">
             <p>© <span id="currentYear"></span> p6sims by <a id="creatorLinkTopic" href="https://www.instagram.com/hai_faizul/" target="_blank">Hai</a>. All rights reserved.</p>
-            <!-- You can add another line if you like, e.g.: -->
-            <!-- <p>Exploring the fascinating world of physics through interaction.</p> -->
         </div>
     </footer>
 
